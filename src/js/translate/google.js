@@ -206,21 +206,34 @@ function googleTranslate() {
 		tts(q, lan) {
 			lan = this.langMap[lan] || 'en'
 			return new Promise(async (resolve, reject) => {
-				let getUrl = (s) => {
-					return 'https://translate-pa.googleapis.com/v1/textToSpeech?client=gtx' +
-						'&language=en' +
-						'&text=' + encodeURIComponent(s) +
+				try {
+					const url = 'https://translate-pa.googleapis.com/v1/textToSpeech?client=gtx' +
+						'&language=' + lan +
+						'&text=' + encodeURIComponent(q) +
 						'&voice_speed=1' +
-						'&key=AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA'
+						'&key=AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA';
+					let data = await httpGet(url, 'json');
+					let blobUrl = this.base64ToBlobUrl(data.audioContent); // 将 Base64 编码的数据转换为 Blob 对象并创建一个指向该 Blob 的 URL
+					resolve([blobUrl])
+				} catch (e) {
+					reject(e)
 				}
-				let r = []
-				let arr = sliceStr(q, 128); // 写的什么鬼，自己都看不懂了。2025.02.20
-				arr.forEach(text => {
-					r.push(getUrl(text))
-				})
-				resolve(r)
 			})
 		},
+
+		// 将 Base64 编码的数据转换为 Blob 对象并创建一个指向该 Blob 的 URL
+		base64ToBlobUrl(base64Data) {
+			const base64WithoutPrefix = base64Data.replace(/^data:.+;base64,/, '');
+			const binaryData = atob(base64WithoutPrefix);
+			const arrayBuffer = new ArrayBuffer(binaryData.length);
+			const uint8Array = new Uint8Array(arrayBuffer);
+			for (let i = 0; i < binaryData.length; i++) {
+				uint8Array[i] = binaryData.charCodeAt(i);
+			}
+			const blob = new Blob([uint8Array], {type: 'audio/mp3'});
+			return URL.createObjectURL(blob);
+		},
+
 		link(q, srcLan, tarLan) {
 			srcLan = this.langMap[srcLan] || 'auto'
 			tarLan = this.langMap[tarLan] || 'zh-CN'
