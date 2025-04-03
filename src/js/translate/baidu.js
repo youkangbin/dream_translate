@@ -49,6 +49,8 @@ function baiduTranslate() {
             localStorage.setItem('baiduToken', JSON.stringify(this.token))
         },
         getToken() {
+            console.log("ABCDEFG!")
+
             return new Promise((resolve, reject) => {
                 httpGet('https://fanyi.baidu.com/').then(r => {
                     let arr = r.match(/window\.gtk\s=\s['"]([^'"]+)['"];/)
@@ -64,6 +66,7 @@ function baiduTranslate() {
             })
         },
         trans(q, srcLan, tarLan) {
+            console.log("ABCDEFG!")
             return new Promise((resolve, reject) => {
                 if (q.length > 5000) return reject('The text is too large!')
                 if (!this.token.gtk) return reject('baidu gtk empty!')
@@ -86,7 +89,7 @@ function baiduTranslate() {
             })
         },
         unify(r, text, srcLan, tarLan) {
-            // console.log('baidu:', r, text, srcLan, tarLan)
+            console.log('baidu:', r, text, srcLan, tarLan)
             // console.log(JSON.stringify(r))
             let res = getJSONValue(r, 'trans_result', {})
             let data = []

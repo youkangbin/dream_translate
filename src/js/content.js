@@ -156,6 +156,7 @@ function initDialog() {
     iconBut = I('dmx_mouse_icon')
     iconBut.onclick = function (e) {
         iconBut.style.display = 'none'
+        autoChangeAction(iconText)
         sendQuery(iconText)  // 点击图标查询
         showDialog(e.clientX + 10, e.clientY - 35)
     }
@@ -863,6 +864,7 @@ function initQuery(text, clientX, clientY) {
         iconBut.style.display = 'none'
         return
     }
+
     debug('text:', text)
 
     // 自动复制功能
